@@ -44,6 +44,21 @@
     "@aws-cdk/aws-codedeploy:removeAlarmsFromDeploymentGroup": true,
     "@aws-cdk/aws-apigateway:authorizerChangeDeploymentLogicalId": true,
     "@aws-cdk/aws-ec2:launchTemplateDefaultUserData": true,
-    "@aws-cdk/aws-secretsmanager:useAttachedSecretResourcePolicyForSecretTargetAttachments": true
+    "@aws-cdk/aws-secretsmanager:useAttachedSecretResourcePolicyForSecretTargetAttachments": true,
+
+    "stg": {
+      "env": "stg",
+      "accountId": "919951165082",
+      "region": "ap-northeast-1",
+      "vpcId": "vpc-0309270ee4fd6e6b7",
+      "repositoryName": "sample"
+    },
+    "prd": {
+      "env": "prd",
+      "accountId": "REPLACE_HERE",
+      "region": "ap-northeast-1",
+      "vpcId": "vpc-REPLACE_HERE",
+      "repositoryName": "REPLACE_HERE"
+    }
   }
 }

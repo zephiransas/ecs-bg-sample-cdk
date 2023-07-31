@@ -3,6 +3,7 @@ import { Construct } from 'constructs';
 import { IVpc } from 'aws-cdk-lib/aws-ec2';
 import { EcsResources } from './ecs-resources';
 import { Duration } from 'aws-cdk-lib';
+import { nameOf } from './utils';
 
 export class AlbResources {
 
@@ -13,22 +14,22 @@ export class AlbResources {
 
   constructor(scope: Construct, vpc: IVpc, ecsResources: EcsResources) {
   
-    const alb = new elb.ApplicationLoadBalancer(scope, 'sample20230729-alb', {
+    const alb = new elb.ApplicationLoadBalancer(scope, nameOf(scope, "alb"), {
       vpc: vpc,
       internetFacing: true,
     });
   
-    this.productionlistener = alb.addListener('sample20230729-production-listener', {
+    this.productionlistener = alb.addListener(nameOf(scope, "production-listener"), {
       protocol: elb.ApplicationProtocol.HTTP,
       port: 80
     });
   
-    this.testlistener = alb.addListener('sample20230729-test-listener', {
+    this.testlistener = alb.addListener(nameOf(scope, "test-listener"), {
       protocol: elb.ApplicationProtocol.HTTP,
       port: 9000,
     });
   
-    this.blueTarget = this.productionlistener.addTargets('sample20230729-target-blue', {
+    this.blueTarget = this.productionlistener.addTargets(nameOf(scope, "target-blue"), {
       healthCheck: {
         path: "/hello",
         port: "9000",
@@ -40,7 +41,7 @@ export class AlbResources {
       targets: [ecsResources.ecsService]
     });
 
-    this.greenTarget = this.testlistener.addTargets('sample20230729-target-green', {
+    this.greenTarget = this.testlistener.addTargets(nameOf(scope, "target-green"), {
       healthCheck: {
         path: "/hello",
         port: "9000",

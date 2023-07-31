@@ -4,6 +4,7 @@ import { Construct } from 'constructs';
 import { IVpc } from 'aws-cdk-lib/aws-ec2';
 import { IRepository } from 'aws-cdk-lib/aws-ecr';
 import { ILogGroup } from 'aws-cdk-lib/aws-logs';
+import { nameOf } from './utils';
 
 export class EcsResources {
 
@@ -12,13 +13,13 @@ export class EcsResources {
   constructor(scope: Construct, vpc: IVpc, repo: IRepository, logGroup: ILogGroup) {
 
     // Cluster
-    const cluster = new ecs.Cluster(scope, "sample20230729-ecs-cluster", {
-      clusterName: "sample20230729-ecs-cluster",
+    const cluster = new ecs.Cluster(scope, nameOf(scope, "ecs-cluster"), {
+      clusterName: nameOf(scope, "ecs-cluster"),
       vpc: vpc
     });
 
     // TaskDefinition
-    const taskDefinition = new ecs.FargateTaskDefinition(scope, "sample20230729-task-def", {
+    const taskDefinition = new ecs.FargateTaskDefinition(scope, nameOf(scope, "task-def"), {
       memoryLimitMiB: 2048,
       cpu: 1024
     });
@@ -39,7 +40,7 @@ export class EcsResources {
     })
 
     // Service
-    this.ecsService = new ecs.FargateService(scope, "sample20230729-service", {
+    this.ecsService = new ecs.FargateService(scope, nameOf(scope, "service"), {
       cluster: cluster,
       taskDefinition: taskDefinition,
       desiredCount: 0,

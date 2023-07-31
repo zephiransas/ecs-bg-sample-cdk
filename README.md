@@ -15,12 +15,16 @@ The `cdk.json` file tells the CDK Toolkit how to execute your app.
 
 
 ```
+cdk -c env=stg deploy
+```
+
+```
 version: 0.0
 Resources:
   - TargetService:
       Type: AWS::ECS::Service
       Properties:
-        TaskDefinition: "arn:aws:ecs:ap-northeast-1:919951165082:task-definition/Sample20230729Stacksample20230729taskdef4FE8F0E8:7"
+        TaskDefinition: "arn:aws:ecs:ap-northeast-1:919951165082:task-definition/EcsBgSampleStackecsbgsamplestgtaskdef82F53DA4:1"
         LoadBalancerInfo:
           ContainerName: "app"
           ContainerPort: 9000

@@ -6,17 +6,21 @@ import * as codedeploy from 'aws-cdk-lib/aws-codedeploy';
 import { Construct } from 'constructs';
 import { EcsResources } from './ecs-resources';
 import { AlbResources } from './alb-resources';
+import { getContext, nameOf } from './utils';
 
-export class Sample20230729Stack extends cdk.Stack {
+export class EcsBgSampleStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    const vpc = ec2.Vpc.fromLookup(this, "vpc", {vpcId: "vpc-0309270ee4fd6e6b7"});
+    const ctx = getContext(scope)
 
-    const repo = ecr.Repository.fromRepositoryName(this, "sample", "sample");
+    const vpc = ec2.Vpc.fromLookup(this, "vpc", {vpcId: ctx.vpcId});
 
-    const logGroup = new log.LogGroup(this, "sample20230729-ecs-log", {
-      logGroupName: "sample20230729-ecs-log"
+    const repo = ecr.Repository.fromRepositoryName(this, ctx.repositoryName, ctx.repositoryName);
+
+    const logGroup = new log.LogGroup(this, nameOf(scope, "ecs-logs"), {
+      logGroupName: nameOf(scope, "ecs-logs"),
+      removalPolicy: cdk.RemovalPolicy.DESTROY,   //本番運用時には変えること
     });
 
     // ECS
@@ -26,11 +30,11 @@ export class Sample20230729Stack extends cdk.Stack {
     const albResources = new AlbResources(this, vpc, ecsResources)
 
     // CodeDeploy
-    const app = new codedeploy.EcsApplication(this, "sample20230729-app", {
-      applicationName: "sample20230729-app"
+    const app = new codedeploy.EcsApplication(this, nameOf(scope, "cd-application"), {
+      applicationName: nameOf(scope, "cd-application")
     })
 
-    new codedeploy.EcsDeploymentGroup(this, "group", {
+    new codedeploy.EcsDeploymentGroup(this, nameOf(scope, "deployment-group"), {
       application: app,
       service: ecsResources.ecsService,
       blueGreenDeploymentConfig: {

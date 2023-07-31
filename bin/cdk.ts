@@ -1,10 +1,12 @@
 #!/usr/bin/env node
 import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
-import { Sample20230729Stack } from '../lib/sample20230729-stack';
+import { EcsBgSampleStack } from '../lib/ecs-bg-sample-stack';
+import { getContext } from '../lib/utils';
 
 const app = new cdk.App();
-new Sample20230729Stack(app, 'Sample20230729Stack', {
+const ctx = getContext(app)
+new EcsBgSampleStack(app, 'EcsBgSampleStack', {
   /* If you don't specify 'env', this stack will be environment-agnostic.
    * Account/Region-dependent features and context lookups will not work,
    * but a single synthesized template can be deployed anywhere. */
@@ -15,7 +17,7 @@ new Sample20230729Stack(app, 'Sample20230729Stack', {
 
   /* Uncomment the next line if you know exactly what Account and Region you
    * want to deploy the stack to. */
-  env: { account: '919951165082', region: 'ap-northeast-1' },
+  env: { account: ctx.accountId, region: ctx.region },
 
   /* For more information, see https://docs.aws.amazon.com/cdk/latest/guide/environments.html */
 });
