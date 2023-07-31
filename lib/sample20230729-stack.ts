@@ -1,12 +1,11 @@
 import * as cdk from 'aws-cdk-lib';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
-import * as elb from 'aws-cdk-lib/aws-elasticloadbalancingv2';
 import * as ecr from 'aws-cdk-lib/aws-ecr';
 import * as log from 'aws-cdk-lib/aws-logs';
 import * as codedeploy from 'aws-cdk-lib/aws-codedeploy';
 import { Construct } from 'constructs';
 import { EcsResources } from './ecs-resources';
-import { Duration } from 'aws-cdk-lib';
+import { AlbResources } from './alb-resources';
 
 export class Sample20230729Stack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -24,45 +23,9 @@ export class Sample20230729Stack extends cdk.Stack {
     const ecsResources = new EcsResources(this, vpc, repo, logGroup)
 
     // ALB
-    const alb = new elb.ApplicationLoadBalancer(this, 'sample20230729-alb', {
-      vpc: vpc,
-      internetFacing: true,
-    });
+    const albResources = new AlbResources(this, vpc, ecsResources)
 
-    const productionlistener = alb.addListener('sample20230729-production-listener', {
-      protocol: elb.ApplicationProtocol.HTTP,
-      port: 80
-    });
-
-    const testlistener = alb.addListener('sample20230729-test-listener', {
-      protocol: elb.ApplicationProtocol.HTTP,
-      port: 9000,
-    });
-
-    const blueTarget = productionlistener.addTargets('sample20230729-target-blue', {
-      healthCheck: {
-        path: "/hello",
-        port: "9000",
-        interval: Duration.seconds(10),
-        healthyThresholdCount: 10,
-        timeout: Duration.seconds(5)
-      },
-      protocol: elb.ApplicationProtocol.HTTP,
-      targets: [ecsResources.ecsService]
-    });
-
-    const greenTarget = testlistener.addTargets('sample20230729-target-green', {
-      healthCheck: {
-        path: "/hello",
-        port: "9000",
-        interval: Duration.seconds(10),
-        healthyThresholdCount: 10,
-        timeout: Duration.seconds(5)
-      },
-      protocol: elb.ApplicationProtocol.HTTP,
-      targets: [ecsResources.ecsService]
-    });
-
+    // CodeDeploy
     const app = new codedeploy.EcsApplication(this, "sample20230729-app", {
       applicationName: "sample20230729-app"
     })
@@ -71,10 +34,10 @@ export class Sample20230729Stack extends cdk.Stack {
       application: app,
       service: ecsResources.ecsService,
       blueGreenDeploymentConfig: {
-        blueTargetGroup: blueTarget,
-        greenTargetGroup: greenTarget,
-        listener: productionlistener,
-        testListener: testlistener,
+        blueTargetGroup: albResources.blueTarget,
+        greenTargetGroup: albResources.greenTarget,
+        listener: albResources.productionlistener,
+        testListener: albResources.testlistener,
         deploymentApprovalWaitTime: cdk.Duration.minutes(10),
         terminationWaitTime: cdk.Duration.minutes(20),
       },
