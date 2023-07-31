@@ -1,8 +1,8 @@
 {
-  "name": "sample20230729",
+  "name": "ecs-sample",
   "version": "0.1.0",
   "bin": {
-    "sample20230729": "bin/sample20230729.js"
+    "cdk": "bin/cdk.js"
   },
   "scripts": {
     "build": "tsc",
