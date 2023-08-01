@@ -24,7 +24,7 @@ Resources:
   - TargetService:
       Type: AWS::ECS::Service
       Properties:
-        TaskDefinition: "arn:aws:ecs:ap-northeast-1:919951165082:task-definition/EcsBgSampleStackecsbgsamplestgtaskdef82F53DA4:1"
+        TaskDefinition: "<新しいTaskDefinitionのARNに置き換える>"
         LoadBalancerInfo:
           ContainerName: "app"
           ContainerPort: 9000

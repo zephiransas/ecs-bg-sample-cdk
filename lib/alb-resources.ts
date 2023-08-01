@@ -19,38 +19,42 @@ export class AlbResources {
       internetFacing: true,
     });
   
+    this.blueTarget = new elb.ApplicationTargetGroup(scope, nameOf(scope, "target-blue"), {
+      vpc: vpc,
+      protocol: elb.ApplicationProtocol.HTTP,
+      targetType: elb.TargetType.IP,
+      healthCheck: {
+        path: "/hello",
+        port: "9000",
+        interval: Duration.seconds(10),
+        healthyThresholdCount: 10,
+        timeout: Duration.seconds(5)
+      },
+    })
+
+    this.greenTarget = new elb.ApplicationTargetGroup(scope, nameOf(scope, "target-green"), {
+      vpc: vpc,
+      protocol: elb.ApplicationProtocol.HTTP,
+      targetType: elb.TargetType.IP,
+      healthCheck: {
+        path: "/hello",
+        port: "9000",
+        interval: Duration.seconds(10),
+        healthyThresholdCount: 10,
+        timeout: Duration.seconds(5)
+      },
+    })
+
     this.productionlistener = alb.addListener(nameOf(scope, "production-listener"), {
       protocol: elb.ApplicationProtocol.HTTP,
-      port: 80
+      port: 80,
+      defaultTargetGroups: [this.blueTarget]
     });
-  
+
     this.testlistener = alb.addListener(nameOf(scope, "test-listener"), {
       protocol: elb.ApplicationProtocol.HTTP,
       port: 9000,
-    });
-  
-    this.blueTarget = this.productionlistener.addTargets(nameOf(scope, "target-blue"), {
-      healthCheck: {
-        path: "/hello",
-        port: "9000",
-        interval: Duration.seconds(10),
-        healthyThresholdCount: 10,
-        timeout: Duration.seconds(5)
-      },
-      protocol: elb.ApplicationProtocol.HTTP,
-      targets: [ecsResources.ecsService]
-    });
-
-    this.greenTarget = this.testlistener.addTargets(nameOf(scope, "target-green"), {
-      healthCheck: {
-        path: "/hello",
-        port: "9000",
-        interval: Duration.seconds(10),
-        healthyThresholdCount: 10,
-        timeout: Duration.seconds(5)
-      },
-      protocol: elb.ApplicationProtocol.HTTP,
-      targets: [ecsResources.ecsService]
+      defaultTargetGroups: [this.blueTarget]
     });
 
   }

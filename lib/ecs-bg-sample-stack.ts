@@ -29,6 +29,9 @@ export class EcsBgSampleStack extends cdk.Stack {
     // ALB
     const albResources = new AlbResources(this, vpc, ecsResources)
 
+    // ECSのServiceをBlue Targetにのみ追加する
+    albResources.blueTarget.addTarget(ecsResources.ecsService)
+
     // CodeDeploy
     const app = new codedeploy.EcsApplication(this, nameOf(scope, "cd-application"), {
       applicationName: nameOf(scope, "cd-application")
