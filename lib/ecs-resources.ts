@@ -48,7 +48,7 @@ export class EcsResources {
       deploymentController: { 
         type: ecs.DeploymentControllerType.CODE_DEPLOY,
       },
-      vpcSubnets: vpc.selectSubnets({subnetType: ec2.SubnetType.PUBLIC })
+      vpcSubnets: vpc.selectSubnets({subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS })
     });
     
   }
